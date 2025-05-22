@@ -1,0 +1,21 @@
+function [outputArg1,outputArg2] = bm2d_sim(a1, a2, b1, b2, rho, T, n, N)
+    
+    dt = T / n; 
+    
+    Z1 = randn(N, n);
+    Z2 = randn(N, n);
+    
+
+    dW1 = sqrt(dt) * Z1; % 第一维布朗运动增量
+    dW2 = rho * sqrt(dt) * Z1 + sqrt(dt) * sqrt(1 - rho^2) * Z2; % 第二维增量
+    
+    % 累积求和得到路径（包括初始点0）
+    W1 = [zeros(N, 1), cumsum(dW1, 2)];
+    W2 = [zeros(N, 1), cumsum(dW2, 2)];
+    
+    % 时间向量
+    t = linspace(0, T, n+1);
+
+
+
+end

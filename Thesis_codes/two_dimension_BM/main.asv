@@ -1,0 +1,46 @@
+a1 = -2;
+a2 = -2;
+b1 = 1;
+b2 = 1;
+rho = 0.3;
+
+T = 1;
+n = 1000;
+N = 1e6;
+
+%%
+
+[W1, W2, in_region, exit_time, exit_pos] = bm2d_sim(a1, a2, b1, b2, rho, T, n, N);
+plot_brownian_density(W1, W2, in_region, a1, a2, b1, b2)
+
+
+
+%%
+[heatFlow, points_x, points_y, S] = bem_heatFlow(a1, a2, b1, b2, rho, T, 20, 800);
+
+x = linspace(a1, b1, 100);
+y = linspace(a2, b2, 100);
+[X, Y] = meshgrid(x, y);
+density = zeros(size(X));
+
+for i = 1:size(X, 1)
+    for j = 1:size(X, 2)
+        density(i, j) = bem_calc(X(i, j), Y(i, j), rho, T, heatFlow, points_x, points_y, S);
+    end
+end
+%%
+figure;
+imagesc(x, y, density');  % 注意 density 需要转置（'）
+axis xy;                  % 数学坐标系（原点在下）
+colorbar;
+hold on;
+rectangle('Position', [a1, a2, b1-a1, b2-a2], ...
+    'EdgeColor', 'r', 'LineWidth', 1.5);
+
+survival_prob = trapz(x, trapz(y, density, 1), 2);
+title(sprintf('Conditional Probability Density (Survival Prob=%.2f%%)', survival_prob*100));
+xlabel('W1(T)');
+ylabel('W2(T)');
+
+colormap('jet');
+hold off;
